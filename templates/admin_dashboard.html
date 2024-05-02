@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<script>
+$(document).ready(function(){
+ $("#username").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#usersTable tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+ });
+});
+</script>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Поиск пользователя</h2>
+            <div class="form-group">
+                <label for="username">Фильтр:</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Введите имя или почту">
+            </div>
+             <form action="/admin/add_user" method="get">
+                <button class="btn btn-primary mt-3" type="submit"><i class="fa-solid fa-plus"></i> Добавить волонтёра</button>
+            </form>
+        </div>
+        <div class="fixed-bottom d-flex justify-content-end p-3">
+            <form action="/admin/settings" method="get">
+                <button class="btn btn-info mt-3" type="submit"><i class="fa-solid fa-gear"></i></button>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <h2>Список пользователей</h2>
+            <table class="table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Имя пользователя</th>
+                        <th>Почта</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>
+                                {% if user.email %}
+                                    <a href="{{ url_for('search_user', user_login=user.email) }}"><i class="fa-regular fa-file-lines"></i></a>
+                                {% endif %}
+                                {{ user.name }} {{ user.surname }}
+                            </td>
+                            <td>
+                                {% if user.email %}
+                                    <a href="mailto:{{ user.email }}">{{ user.email }}</a>
+                                {% else %}
+                                    Пользователь ещё не зарегистрировался
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
