@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-        <h1>{{ user.surname }}{{ user.name }}</h1>
+        <h1>{{ user.surname }} {{ user.name }}</h1>
         <p>Электронная почта: {{ user.email }}</p>
         <p>{% if current_user.status == "admin" %}Администратор{% elif current_user.status == "worker" %}Исполнитель{% elif current_user.status == "hirer" %}Заказчик{% endif %}</p>
         {% if user.status == "hirer" %}

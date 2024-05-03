@@ -85,7 +85,7 @@ def load_user(user_id):
 @app.route('/index')
 def index():
 	"""Корневая страница"""
-	return render_template('index.html', title='Главная')
+	return render_template('index.html', orders=db.query(Order).all(), title='Главная')
 
 
 @login_required
@@ -106,7 +106,7 @@ def upload():
 		db.add(order)
 		db.commit()
 
-		return 'Заказ успешно создан'
+		return redirect(url_for('index'))
 
 	return render_template('add_order.html', title='Размещение заказа')
 

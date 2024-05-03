@@ -1,7 +1,30 @@
 {% extends "base.html" %}
-<title>SSO</title>
 {% block content %}
-    {% if current_user.is_authenticated %}
-        <h2>Пользователь авторизирован</h2>
-    {% endif %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2>Все заказы:</h2>
+            {% for order in orders %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    Заказ "{{ order.title }}"
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Описание: {{ order.descr }}</p>
+                    <p class="card-text">Цена: {{ order.price }}<i class="fas fa-ruble-sign"></i></p>
+                    {% if current_user.status == 'worker' %}
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="replyContent">Ваш отклик</label>
+                            <textarea class="form-control" id="replyContent" name="replyContent" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Оставить отклик</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}
