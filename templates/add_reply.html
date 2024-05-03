@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 style="text-align: center;">Добавить описание к отклику для заказа "{{ order.title }}"</h2>
+            <p style="text-align: center;">{{ order.descr }}</p>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="title">Заголовок отклика</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="Введите заголовок" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Описание отклика</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить описание</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

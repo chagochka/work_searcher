@@ -18,7 +18,7 @@ class Reply(SqlAlchemyBase, UserMixin):
     worker_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'))
     order_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('orders.id'))
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    status = sqlalchemy.Column(sqlalchemy.Enum('viewed', 'unviewed', 'accepted', name='status'), nullable=False)
+    status = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     descr = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 

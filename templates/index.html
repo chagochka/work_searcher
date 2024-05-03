@@ -3,7 +3,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h2>Все заказы:</h2>
+            <h2>Все заказы: {% if current_user.status == 'worker' %} (<a href="{{ url_for('workers_replies') }}">Мои отклики</a>) {% endif %}</h2>
             {% for order in orders %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-primary text-white">
@@ -13,13 +13,7 @@
                     <p class="card-text">Описание: {{ order.descr }}</p>
                     <p class="card-text">Цена: {{ order.price }}<i class="fas fa-ruble-sign"></i></p>
                     {% if current_user.status == 'worker' %}
-                    <form method="POST">
-                        <div class="form-group">
-                            <label for="replyContent">Ваш отклик</label>
-                            <textarea class="form-control" id="replyContent" name="replyContent" rows="3"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-success">Оставить отклик</button>
-                    </form>
+                        <a href="{{ url_for('add_reply', order_id=order.id) }}" class="btn btn-primary">Оставить отклик</a>
                     {% endif %}
                 </div>
             </div>

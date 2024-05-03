@@ -90,7 +90,7 @@ def index():
 
 @login_required
 @app.route('/add_order', methods=['GET', 'POST'])
-def upload():
+def add_order():
 	"""Страница для создания заказа"""
 
 	if request.method == 'POST':
@@ -109,6 +109,33 @@ def upload():
 		return redirect(url_for('index'))
 
 	return render_template('add_order.html', title='Размещение заказа')
+
+
+@login_required
+@app.route('/add_reply/<int:order_id>', methods=['GET', 'POST'])
+def add_reply(order_id):
+	"""Страница для отправления отклика"""
+
+	if request.method == 'POST':
+		reply = Reply()
+		reply.worker_id = current_user.id
+		reply.order_id = order_id
+		reply.title = request.form['title']
+		reply.descr = request.form['description']
+		reply.status = 'unviewed'
+		db.add(reply)
+		db.commit()
+
+		return redirect(url_for('workers_replies'))
+
+	return render_template('add_reply.html', order=db.query(Order).filter(Order.id == order_id).first(), title='Оставить отклик')
+
+@login_required
+@app.route('/worker_replies', methods=['GET'])
+def workers_replies():
+	"""Страница для отправления отклика"""
+
+	return render_template('workers_replies.html', title='Мои отклики')
 
 
 # URL http://localhost:5000/register
