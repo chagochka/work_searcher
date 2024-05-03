@@ -11,6 +11,6 @@ class RegisterForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_again = PasswordField('Подтвердите пароль', validators=[DataRequired(), EqualTo('password')])
-    role = SelectField('Роль', choices=[('worker', 'Работник'), ('hirer', 'Работодатель')], validators=[DataRequired()])
+    role = SelectField('Роль', choices=[('worker', 'Испольнитель'), ('hirer', 'Заказчик')], validators=[DataRequired()])
     about = TextAreaField('О себе', validators=[DataRequired()], render_kw={"rows": 5})
     submit = SubmitField('Зарегистрироваться')

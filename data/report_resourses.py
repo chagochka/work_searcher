@@ -1,13 +1,13 @@
 from flask import jsonify
 from flask_restful import abort, Resource
 from . import db_session
-from .reports import Report
+from .replies import Reply
 
 
 def not_found(report_id):
     """Проверка существования отчёта в базе данных"""
     db = db_session.create_session()
-    report = db.query(Report).get(report_id)
+    report = db.query(Reply).get(report_id)
     if not report:
         abort(404, message=f'News {report_id} not found')
 
@@ -20,7 +20,7 @@ class ReportResource(Resource):
         """Смотрит один отчёт из базы"""
         not_found(report_id)
         db = db_session.create_session()
-        report = db.query(Report).get(report_id)
+        report = db.query(Reply).get(report_id)
         return jsonify(
             {
                 'reports': report.to_dict(
@@ -33,7 +33,7 @@ class ReportResource(Resource):
         """Удаляет один отчёт из базы"""
         not_found(report_id)
         db = db_session.create_session()
-        report = db.query(Report).get(report_id)
+        report = db.query(Reply).get(report_id)
         db.delete(report)
         db.commit()
         return jsonify({'success': 'OK'})
@@ -46,7 +46,7 @@ class ReportsList(Resource):
     def get():
         """Смотрит список отчётов в базе"""
         db = db_session.create_session()
-        report = db.query(Report).all()
+        report = db.query(Reply).all()
         return jsonify(
             {
                 'reports': [item.to_dict() for item in report]
@@ -57,7 +57,7 @@ class ReportsList(Resource):
     def post():
         """Добавляет отчёт в список отчётов"""
         db = db_session.create_session()
-        report = Report()
+        report = Reply()
         db.add(report)
         db.commit()
         return jsonify({'success': 'OK'})

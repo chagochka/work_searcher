@@ -6,7 +6,7 @@ import sqlalchemy
 from sqlalchemy import orm
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from .reports import Report
+from .replies import Reply
 from .db_session import SqlAlchemyBase
 
 
@@ -20,10 +20,12 @@ class User(SqlAlchemyBase, UserMixin):
 	name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 	status = sqlalchemy.Column(sqlalchemy.Enum('hirer', 'worker', 'admin', name='status'), nullable=False)
 	email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
+	about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 	hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 	created_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
-	reports = orm.relationship('Report', back_populates="users")
+	replies = orm.relationship('Reply', back_populates="users")
+	orders = orm.relationship('Order', back_populates="users")
 
 	def set_password(self, password):
 		"""Создание хеша пароля"""

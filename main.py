@@ -27,8 +27,10 @@ from data import db_session, admin_api
 from data.login import LoginForm
 from data.register import RegisterForm
 from data.report_resourses import ReportResource, ReportsList
-from data.reports import Report
+from data.replies import Reply
 from data.users import User
+from data.orders import Order
+from data.replies import Reply
 
 UPLOAD_FOLDER = 'reports'
 
@@ -79,17 +81,6 @@ def load_user(user_id):
 	return db.get(User, user_id)
 
 
-@app.route('/uploads/<report_id>', methods=["GET"])
-def uploaded_report(report_id):
-	db = db_session.create_session()
-
-	report = db.query(Report).filter(Report.id == report_id).first()
-	author = report.users
-
-	directory = os.path.join(app.config['UPLOAD_FOLDER'], f'{author.surname}-{author.name}')
-	return send_from_directory(directory, f'{report.date}.docx')
-
-
 @app.route('/')
 @app.route('/index')
 def index():
@@ -98,52 +89,26 @@ def index():
 
 
 @login_required
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/add_order', methods=['GET', 'POST'])
 def upload():
-	"""Страница для отправки отчёта"""
+	"""Страница для создания заказа"""
 
 	if request.method == 'POST':
-		if 'file' not in request.files:
-			return 'No file part', 400
-		file = request.files['file']
-		if file.filename == '':
-			return 'No selected file', 400
-		if file and allowed_file(file.filename):
-			# filename = secure_filename(file.filename)
-			if not os.path.exists(
-				os.path.join(app.config['UPLOAD_FOLDER'], f'{current_user.surname}-{current_user.name}')):
-				os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], f'{current_user.surname}-{current_user.name}'))
+		description = request.form['description']
+		price = request.form['price']
+		title = request.form['title']
 
-			config = configparser.ConfigParser()
-			config.read('settings.ini')
+		order = Order()
+		order.hirer_id = current_user.id
+		order.title = title
+		order.price = price
+		order.descr = description
+		db.add(order)
+		db.commit()
 
-			deadlines = [config.get('deadlines', deadline) for deadline in config.options('deadlines')]
+		return 'Заказ успешно создан'
 
-			maxLinks = config.get('settings', 'maxLinks', fallback='20')
-			minLinks = config.get('settings', 'minLinks', fallback='30')
-
-			if not any([0 <= (datetime.datetime.strptime(deadline, '%Y-%m-%d') - datetime.datetime.now()).days <= 3
-			            for deadline in deadlines]):
-				return render_template('upload.html', message='До дедлайна ещё далеко')
-
-			date = datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S")
-			tmp = os.path.join(f'{current_user.surname}-{current_user.name}', f'{date}.docx')
-			path = os.path.join(app.config['UPLOAD_FOLDER'], str(tmp))
-			file.save(path)
-
-			links = find_links(path)
-			report = Report()
-			report.author_id = current_user.id
-			report.points = 0
-			report.date = date
-			report.status = 'Не проверено'
-			report.links = links
-			db.add(report)
-			db.commit()
-
-			return render_template('upload.html', message='Отчёт успешно отправлен', title='Загрузка отчёта')
-
-	return render_template('upload.html', title='Загрузка отчёта')
+	return render_template('add_order.html', title='Размещение заказа')
 
 
 # URL http://localhost:5000/register
@@ -167,7 +132,7 @@ def register():
 			surname=regform.last_name.data,
 			email=regform.email.data,
 			status=regform.role.data,
-			# about=regform.about.data
+			about=regform.about.data
 		)
 		new_user.set_password(regform.password.data)
 		db.add(new_user)
@@ -209,31 +174,30 @@ def login():
 def search_user(user_login):
 	"""Страница пользователя"""
 	user = db.query(User).filter(User.email == user_login).first()
-	user_reports_list = user.reports
-	return render_template('user_account_form.html', user=user, reports=user_reports_list, title=f'Отчёты {user.name}')
+	return render_template('user_account_form.html', user=user, orders=user.orders, replies=user.replies, title=f'Профиль {user.name} {user.surname}')
 
 
-@app.route('/update_report/<int:report_id>', methods=['POST'])
-@login_required
-def update_report(report_id):
-	if not current_user.status == "admin":
-		return redirect(url_for('index'))
-
-	report = db.query(Report).get(report_id)
-
-	points = request.form.get('points', type=int)
-	status = request.form.get('status')
-	if points is not None and status:
-		try:
-			report.points = points
-			report.status = status
-			print(status)
-			db.commit()
-		except:
-			db.rollback()
-			raise
-
-	return redirect(request.referrer)
+# @app.route('/update_report/<int:report_id>', methods=['POST'])
+# @login_required
+# def update_report(report_id):
+# 	if not current_user.status == "admin":
+# 		return redirect(url_for('index'))
+#
+# 	report = db.query(Report).get(report_id)
+#
+# 	points = request.form.get('points', type=int)
+# 	status = request.form.get('status')
+# 	if points is not None and status:
+# 		try:
+# 			report.points = points
+# 			report.status = status
+# 			print(status)
+# 			db.commit()
+# 		except:
+# 			db.rollback()
+# 			raise
+#
+# 	return redirect(request.referrer)
 
 
 # URL http://localhost:5000/logout

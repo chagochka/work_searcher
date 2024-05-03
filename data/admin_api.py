@@ -35,7 +35,7 @@ def group_deadlines_by_month(deadlines):
 
 def get_users():
 	db_sess = db_session.create_session()
-	users = db_sess.query(User).filter(User.status == 'Волонтёр')
+	users = db_sess.query(User).filter(User.status != 'admin')
 	return [user.to_dict() for user in users]
 
 
