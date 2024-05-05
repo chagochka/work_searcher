@@ -128,14 +128,40 @@ def add_reply(order_id):
 
 		return redirect(url_for('workers_replies'))
 
-	return render_template('add_reply.html', order=db.query(Order).filter(Order.id == order_id).first(), title='Оставить отклик')
+	return render_template('add_reply.html', order=db.query(Order).filter(Order.id == order_id).first(),
+	                       title='Оставить отклик')
+
+
+@app.route('/reply/<int:reply_id>', methods=['GET', 'POST'])
+@login_required
+def reply_form(reply_id):
+	reply = db.get(Reply, reply_id)
+	order = db.get(Order, reply.order_id)
+
+	if current_user.status == 'hirer' and order:
+		reply.status = 'viewed'
+
+		if request.method == 'POST':
+			reply.status = 'accepted'
+
+		db.commit()
+	elif reply.worker_id == current_user.id:
+		pass
+	else:
+		return "Вы не имеете права просмотреть этот отклик", 403
+
+	return render_template('reply_form.html', reply=reply, order=order)
+
 
 @login_required
-@app.route('/worker_replies', methods=['GET'])
-def workers_replies():
-	"""Страница для отправления отклика"""
+@app.route('/worker_replies/<int:order_id>', methods=['GET'])
+def workers_replies(order_id):
+	"""Страница для просмотра откликов"""
 
-	return render_template('workers_replies.html', title='Мои отклики')
+	if order_id > 0:
+		return render_template('workers_replies.html', replies=db.get(Order, order_id).replies, title='Отклики')
+
+	return render_template('workers_replies.html', replies=current_user.replies, title='Мои отклики')
 
 
 # URL http://localhost:5000/register
@@ -201,7 +227,8 @@ def login():
 def search_user(user_login):
 	"""Страница пользователя"""
 	user = db.query(User).filter(User.email == user_login).first()
-	return render_template('user_account_form.html', user=user, orders=user.orders, replies=user.replies, title=f'Профиль {user.name} {user.surname}')
+	return render_template('user_account_form.html', user=user, orders=user.orders, replies=user.replies,
+	                       title=f'Профиль {user.name} {user.surname}')
 
 
 # @app.route('/update_report/<int:report_id>', methods=['POST'])

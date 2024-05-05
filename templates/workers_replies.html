@@ -1,7 +1,22 @@
 {% extends "base.html" %}
-
 {% block content %}
-    <div>
-        {{current_user.replies}}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% for reply in replies %}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <a class="text-white" href="{{ url_for('reply_form', reply_id=reply.id) }}">Отклик "{{ reply.title }}"</a>
+                </div>
+                <div class="card-body">
+                    <p class="card-text"><a href="{{ url_for('search_user', user_login=reply.users.email) }}">{{ reply.users.name }}</a></p>
+                    {% if current_user.status == 'hirer' %}
+                        <a href="{{ url_for('reply_form', reply_id=reply.id) }}" class="btn btn-primary">Подробнее</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+</div>
 {% endblock %}

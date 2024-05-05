@@ -3,7 +3,7 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h2>Все заказы: {% if current_user.status == 'worker' %} (<a href="{{ url_for('workers_replies') }}">Мои отклики</a>) {% endif %}</h2>
+            <h2>Все заказы: {% if current_user.status == 'worker' %} (<a href="{{ url_for('workers_replies', order_id=0) }}">Мои отклики</a>) {% endif %}</h2>
             {% for order in orders %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-primary text-white">

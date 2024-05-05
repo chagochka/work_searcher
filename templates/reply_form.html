@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Отклик на {{ order.title }}</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ reply.title }}</h5>
+            <p class="card-text">Исполнитель <a href="{{ url_for('search_user', user_login=reply.users.email) }}">{{ reply.users.name }}</a></p>
+            <p class="card-text">{{ reply.descr }}</p>
+            {% if current_user.status == 'hirer' %}
+                {% if reply.status != 'accepted' %}
+                <form method="post">
+                    <button type="submit" class="btn btn-primary">Принять заказ</button>
+                </form>
+                {% else %}
+                <p>Этот отклик принят</p>
+                {% endif %}
+            {% else %}
+                {% if reply.status == 'viewed' %}
+                <span class="badge bg-primary text-white">Просмотрено</span>
+                {% elif reply.status == 'unviewed' %}
+                <span class="badge bg-warning text-white">Непросмотрено</span>
+                {% elif reply.status == 'accepted' %}
+                <span class="badge bg-success text-white">Принято</span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

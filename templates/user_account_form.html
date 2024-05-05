@@ -2,13 +2,13 @@
 {% block content %}
         <h1>{{ user.surname }} {{ user.name }}</h1>
         <p>Электронная почта: {{ user.email }}</p>
-        <p>{% if current_user.status == "admin" %}Администратор{% elif current_user.status == "worker" %}Исполнитель{% elif current_user.status == "hirer" %}Заказчик{% endif %}</p>
+        <p>{% if user.status == "admin" %}Администратор{% elif user.status == "worker" %}Исполнитель{% elif user.status == "hirer" %}Заказчик{% endif %}</p>
         {% if user.status == "hirer" %}
             <h2>Мои заказы</h2>
             <ul>
                 {% for order in orders %}
                     <li>
-                        <strong>Заказ "{{ order.title }}"</strong>: {{ order.description }}
+                        <strong>Заказ "{{ order.title }}"</strong>: <a href="{{ url_for('workers_replies', order_id=order.id) }}">Отклики</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -17,7 +17,7 @@
             <ul>
                 {% for reply in replies %}
                     <li>
-                        <strong>Отклик "{{ reply.title }}"</strong>: {{ reply.content }}
+                        <a href="{{ url_for('reply_form', reply_id=reply.id) }}"><strong>Отклик "{{ reply.title }}"</strong>: {{ reply.content }}</a>
                     </li>
                 {% endfor %}
             </ul>
