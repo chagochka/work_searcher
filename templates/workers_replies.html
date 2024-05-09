@@ -2,6 +2,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
+        {% if replies %}
         <div class="col-md-8">
             {% for reply in replies %}
             <div class="card mb-4 shadow-sm">
@@ -17,6 +18,9 @@
             </div>
             {% endfor %}
         </div>
+        {% else %}
+            <p>Откликов пока нет</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

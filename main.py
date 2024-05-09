@@ -1,9 +1,8 @@
-import configparser
 import datetime
 import os
 
-from docx import Document
-from docx.opc.constants import RELATIONSHIP_TYPE as RT
+from sqlalchemy import desc
+
 from flask import (
 	Flask,
 	render_template,
@@ -20,7 +19,6 @@ from flask_login import (
 	current_user
 )
 from flask_restful import Api
-from sqlalchemy import and_
 from werkzeug.utils import redirect
 
 from data import db_session, admin_api
@@ -52,18 +50,6 @@ def allowed_file(filename):
 		filename.rsplit('.', 1)[1].lower() in {'docx'}
 
 
-def find_links(file):
-	document = Document(file)
-	rels = document.part.rels
-	links = 0
-
-	for rel in rels:
-		if rels[rel].reltype == RT.HYPERLINK:
-			links += 1
-
-	return links
-
-
 @app.errorhandler(404)
 def not_found(error):
 	return make_response(jsonify({'error': 'Not found'}), 404)
@@ -85,7 +71,7 @@ def load_user(user_id):
 @app.route('/index')
 def index():
 	"""Корневая страница"""
-	return render_template('index.html', orders=db.query(Order).all(), title='Главная')
+	return render_template('index.html', orders=db.query(Order).order_by(desc(Order.date)).all(), title='Главная')
 
 
 @login_required
@@ -126,10 +112,9 @@ def add_reply(order_id):
 		db.add(reply)
 		db.commit()
 
-		return redirect(url_for('workers_replies'))
+		return redirect(url_for('workers_replies', order_id=0))
 
-	return render_template('add_reply.html', order=db.query(Order).filter(Order.id == order_id).first(),
-	                       title='Оставить отклик')
+	return render_template('add_reply.html', order=db.get(Order, order_id), title='Оставить отклик')
 
 
 @app.route('/reply/<int:reply_id>', methods=['GET', 'POST'])
@@ -161,7 +146,8 @@ def workers_replies(order_id):
 	if order_id > 0:
 		return render_template('workers_replies.html', replies=db.get(Order, order_id).replies, title='Отклики')
 
-	return render_template('workers_replies.html', replies=current_user.replies, title='Мои отклики')
+	return render_template('workers_replies.html', replies=sorted(db.get(
+		User, current_user.id).replies, key=lambda reply: reply.date), title='Мои отклики')
 
 
 # URL http://localhost:5000/register

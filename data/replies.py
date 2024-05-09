@@ -20,7 +20,7 @@ class Reply(SqlAlchemyBase, UserMixin):
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     status = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     descr = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 
     users = orm.relationship('User', back_populates="replies")
     orders = orm.relationship('Order', back_populates="replies")
