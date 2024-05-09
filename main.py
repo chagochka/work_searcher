@@ -9,7 +9,7 @@ from flask import (
 	request,
 	make_response,
 	jsonify,
-	send_from_directory, url_for
+	url_for
 )
 from flask_login import (
 	LoginManager,
@@ -24,25 +24,17 @@ from werkzeug.utils import redirect
 from data import db_session, admin_api
 from data.login import LoginForm
 from data.register import RegisterForm
-from data.report_resourses import ReportResource, ReportsList
-from data.replies import Reply
 from data.users import User
 from data.orders import Order
 from data.replies import Reply
 
-UPLOAD_FOLDER = 'reports'
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandex_lyceum_secret_key'
+app.config['SECRET_KEY'] = 'chagochka_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 api = Api(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-if not os.path.exists(UPLOAD_FOLDER):
-	os.makedirs(UPLOAD_FOLDER)
 
 
 def allowed_file(filename):
@@ -150,7 +142,6 @@ def workers_replies(order_id):
 		User, current_user.id).replies, key=lambda reply: reply.date), title='Мои отклики')
 
 
-# URL http://localhost:5000/register
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 	db = db_session.create_session()
@@ -161,9 +152,7 @@ def register():
 		existing_user = db.query(User).filter(User.email == regform.email.data).first()
 		if existing_user:
 			return render_template('register.html',
-			                       title='Регистрация',
-			                       form=regform,
-			                       message='Такой пользователь уже есть')
+			                       title='Регистрация', form=regform, message='Такой пользователь уже есть')
 
 		# Создание нового пользователя
 		new_user = User(
@@ -185,7 +174,6 @@ def register():
 	)
 
 
-# URL http://localhost:5000/login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	"""Авторизация"""
@@ -217,30 +205,6 @@ def search_user(user_login):
 	                       title=f'Профиль {user.name} {user.surname}')
 
 
-# @app.route('/update_report/<int:report_id>', methods=['POST'])
-# @login_required
-# def update_report(report_id):
-# 	if not current_user.status == "admin":
-# 		return redirect(url_for('index'))
-#
-# 	report = db.query(Report).get(report_id)
-#
-# 	points = request.form.get('points', type=int)
-# 	status = request.form.get('status')
-# 	if points is not None and status:
-# 		try:
-# 			report.points = points
-# 			report.status = status
-# 			print(status)
-# 			db.commit()
-# 		except:
-# 			db.rollback()
-# 			raise
-#
-# 	return redirect(request.referrer)
-
-
-# URL http://localhost:5000/logout
 @app.route('/logout')
 @login_required
 def logout():
@@ -261,7 +225,5 @@ if __name__ == '__main__':
 		db.add(admin)
 		db.commit()
 	app.register_blueprint(admin_api.blueprint)
-	api.add_resource(ReportsList, '/api/reports')
-	api.add_resource(ReportResource, '/api/reports/<int:reports_id>')
 	port = int(os.environ.get('PORT', 8000))
 	app.run(host='0.0.0.0', port=port)

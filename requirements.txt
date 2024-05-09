@@ -1,5 +1,4 @@
 python==3.7
-python-docx==1.1.0
 WTForms==3.0.1
 SQLAlchemy==2.0.28
 Werkzeug==2.2.3
