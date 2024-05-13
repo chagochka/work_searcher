@@ -4,11 +4,14 @@ import sqlalchemy as sa
 import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session, DeclarativeBase
 
+
 class SqlAlchemyBase(DeclarativeBase): pass
+
+
 __factory = None
 
 
-def global_init(password):
+def global_init(adress):
 	"""Инициализация базы данных"""
 
 	global __factory
@@ -16,10 +19,10 @@ def global_init(password):
 	if __factory:
 		return
 
-	if not password:
-		raise Exception('Необходимо указать пароль от сервера базы данных.')
+	if not adress:
+		raise Exception('Необходимо указать адрес базы данных.')
 
-	conn_str = f'postgresql://postgres:{password}@localhost:5000/db'
+	conn_str = f'postgresql://{adress}'
 	print(f'Подключение к базе данных по адресу {conn_str}')
 
 	engine = sa.create_engine(conn_str, echo=False)

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
         <h1>{{ user.surname }} {{ user.name }}</h1>
-        <p>Электронная почта: {{ user.email }}</p>
+        <p><a href="mailto:{{ user.email }}">Электронная почта: {{ user.email }}</a></p>
         <p>{% if user.status == "admin" %}Администратор{% elif user.status == "worker" %}Исполнитель{% elif user.status == "hirer" %}Заказчик{% endif %}</p>
         {% if user.status == "hirer" %}
             <h2>Мои заказы</h2>

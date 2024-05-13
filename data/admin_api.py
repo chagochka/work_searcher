@@ -1,6 +1,3 @@
-import configparser
-from collections import defaultdict
-from datetime import datetime
 from functools import wraps
 
 from flask import jsonify, make_response, Blueprint, current_app, render_template, request, redirect, url_for
@@ -15,7 +12,9 @@ blueprint = Blueprint(
 	template_folder='templates'
 )
 
+db_session.global_init('postgres:12345@localhost:5000/db')
 db_sess = db_session.create_session()
+
 def admin_required(f):
 	@wraps(f)
 	@login_required

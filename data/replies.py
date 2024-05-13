@@ -1,5 +1,3 @@
-"""Модель для работы с SQL-таблицей reports"""
-
 import datetime
 
 import sqlalchemy
@@ -10,7 +8,7 @@ from .db_session import SqlAlchemyBase
 
 
 class Reply(SqlAlchemyBase, UserMixin):
-    """Работа с информацией о пользователях"""
+    """Работа с информацией о отликах"""
 
     __tablename__ = 'replies'
 

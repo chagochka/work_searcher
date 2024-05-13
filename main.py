@@ -122,7 +122,7 @@ def reply_form(reply_id):
 			reply.status = 'accepted'
 
 		db.commit()
-	elif reply.worker_id == current_user.id:
+	elif reply.worker_id == current_user.id or current_user.status == 'admin':
 		pass
 	else:
 		return "Вы не имеете права просмотреть этот отклик", 403
@@ -214,11 +214,12 @@ def logout():
 
 
 if __name__ == '__main__':
-	db_session.global_init('12345')
+	db_session.global_init('postgres:12345@localhost:5000/db')
 	db = db_session.create_session()
 	if not list(db.query(User).filter(User.status == 'admin')):
 		admin = User()
 		admin.name = 'ADMIN'
+		admin.surname = 'ADMIN'
 		admin.email = input('Введите свою почту: ')
 		admin.status = 'admin'
 		admin.set_password(input('Установите пароль: '))
